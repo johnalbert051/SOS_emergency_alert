@@ -75,7 +75,7 @@
             <input type="password" placeholder="Password" required>
             <button type="submit">Log in</button>
         </form>
-        <a href="#" class="forgot-password">Forgot Password?</a>
+        <a href="SOS.php" class="forgot-password">Forgot Password?</a>
     </div>
 </body>
 </html>
