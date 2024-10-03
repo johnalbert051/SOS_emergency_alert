@@ -1,0 +1,78 @@
+<html><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Emergency SOS Dashboard</title>
+  <style>
+    /* ... existing styles ... */
+
+    /* New styles for sidebar */
+    .sidebar {
+      height: 100%;
+      width: 250px;
+      position: fixed;
+      z-index: 1;
+      top: 0;
+      left: 0;
+      background-color: #111;
+      overflow-x: hidden;
+      padding-top: 20px;
+    }
+
+    .sidebar a {
+      padding: 16px;
+      text-decoration: none;
+      font-size: 18px;
+      color: #818181;
+      display: block;
+      transition: 0.3s;
+    }
+
+    .sidebar a:hover {
+      color: #f1f1f1;
+    }
+
+    .sidebar hr {
+      border: 0;
+      height: 1px;
+      background-color: #818181;
+      margin: 15px 0;
+    }
+
+    .content {
+      margin-left: 250px;
+      padding: 20px;
+    }
+
+    @media screen and (max-height: 450px) {
+      .sidebar {padding-top: 15px;}
+      .sidebar a {font-size: 18px;}
+    }
+  </style>
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDZRfvMMjOdGIagWecWKW_emC8tif8ndog"></script>
+</head>
+<body>
+  <div class="sidebar">
+    <a href="#dashboard">Dashboard</a>
+    <a href="#inbox">Inbox</a>
+    <a href="#resident-record">Resident Record</a>
+    <a href="#report">Report</a>
+    <hr>
+    <a href="#help-services">Help & Services</a>
+    <a href="#help-center">Help Center</a>
+    <a href="#settings">Settings</a>
+    <a href="#logout">Logout</a>
+  </div>
+
+  <div class="content">
+    <div class="dashboard">
+      <h1>Emergency SOS Dashboard</h1>
+      <div id="map"></div>
+      <div class="sos-list" id="sosList"></div>
+    </div>
+  </div>
+  <div id="notification"></div>
+
+  <script>
+    // ... existing JavaScript ...
+  </script>
+</body></html>
