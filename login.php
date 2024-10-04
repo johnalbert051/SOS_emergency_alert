@@ -17,7 +17,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Verify the password (assuming you are using password_hash)
         if (password_verify($password, $user['password'])) {
             $_SESSION['user_id'] = $user['id']; // Store user ID in session
-            echo json_encode(['status' => 'success', 'message' => 'Login successful']);
+            $_SESSION['role'] = $user['role']; // Store user role in session
+
+            // Return the role in the response
+            echo json_encode(['status' => 'success', 'message' => 'Login successful', 'role' => $user['role']]);
         } else {
             echo json_encode(['status' => 'error', 'message' => 'Invalid password']);
         }

@@ -199,6 +199,7 @@ $last_location = $_SESSION['last_location'] ?? null;
     <a href="#inbox"><i class="fas fa-inbox"></i> Inbox</a>
     <a href="#resident-record"><i class="fas fa-users"></i> Resident Record</a>
     <a href="#report"><i class="fas fa-chart-bar"></i> Report</a>
+    <a href="users.php"><i class="fas fa-users"></i> Users</a>
     <hr>
     <h2>Help & Services</h2>
     <a href="#help-center"><i class="fas fa-question-circle"></i> Help Center</a>

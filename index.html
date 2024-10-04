@@ -3,79 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Barangay Banga 2nd</title>
+    <title>Loading...</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
-            background-image: url('barangay-background.jpg');
-            background-size: cover;
-            background-position: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+            font-family: Arial, sans-serif;
         }
-        .login-container {
-            background-color: rgba(0, 0, 0, 0.7);
-            padding: 40px;
-            border-radius: 10px;
+        .loading {
             text-align: center;
-            color: white;
-            max-width: 400px;
-            width: 100%;
         }
-        .logo {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            margin-bottom: 20px;
-        }
-        h1 {
-            margin: 0 0 20px;
+        .loading h1 {
             font-size: 24px;
+            color: #d9534f;
         }
-        input {
-            width: 100%;
-            padding: 10px;
-            margin: 10px 0;
-            border: none;
-            border-radius: 5px;
-            box-sizing: border-box;
-        }
-        button {
-            width: 100%;
-            padding: 10px;
-            margin-top: 20px;
-            border: none;
-            border-radius: 5px;
-            background-color: #4CAF50;
-            color: white;
-            font-size: 16px;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #45a049;
-        }
-        .forgot-password {
-            margin-top: 10px;
-            font-size: 14px;
-            color: #f44336;
-            text-decoration: none;
+        .loading p {
+            font-size: 18px;
+            color: #555;
         }
     </style>
 </head>
 <body>
-    <div class="login-container">
-        <img src="barangay-logo.png" alt="Barangay Logo" class="logo">
-        <h1>BARANGAY BANGA 2ND<br>PLARIDEL BULACAN</h1>
-        <form>
-            <input type="text" placeholder="Username" required>
-            <input type="password" placeholder="Password" required>
-            <button type="submit">Log in</button>
-        </form>
-        <a href="SOS.php" class="forgot-password">Forgot Password?</a>
+    <div class="loading">
+        <h1>Loading...</h1>
+        <p>Please wait while we redirect you.</p>
     </div>
+
+    <script>
+        // Redirect to index.php after 2 seconds
+        setTimeout(function() {
+            window.location.href = 'login_page_directory.php';
+        }, 2000); // 2000 milliseconds = 2 seconds
+    </script>
 </body>
 </html>
