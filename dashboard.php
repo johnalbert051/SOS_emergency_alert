@@ -1,3 +1,16 @@
+<?php
+// admin_dashboard.php
+
+session_start();
+$last_location = $_SESSION['last_location'] ?? null;
+
+// if ($last_location) {
+//     echo "Last known location: Latitude: " . $last_location['latitude'] . ", Longitude: " . $last_location['longitude'];
+// } else {
+//     echo "No location data available.";
+// }
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -255,25 +268,6 @@
       }, 4000);
     }
 
-    function simulateIncomingSOS() {
-      const sosTypes = ['Medical Emergency', 'Fire', 'Crime in Progress', 'Natural Disaster'];
-      const locations = ['Lagundi', 'Parulan', 'Bintog', 'Agnaya', 'Banga 2nd'];
-      const statuses = ['New', 'In Progress', 'Resolved'];
-
-      setInterval(() => {
-        const sos = {
-          type: sosTypes[Math.floor(Math.random() * sosTypes.length)],
-          location: locations[Math.floor(Math.random() * locations.length)],
-          time: new Date().toLocaleTimeString(),
-          description: 'Emergency assistance required immediately.',
-          status: statuses[Math.floor(Math.random() * statuses.length)],
-          lat: Math.random() * 180 - 90,
-          lng: Math.random() * 360 - 180
-        };
-        addSOS(sos);
-      }, 5000);
-    }
-
     function toggleSidebar() {
       const sidebar = document.getElementById('sidebar');
       const content = document.getElementById('content');
@@ -289,8 +283,17 @@
     function updateUserLocation(position) {
       userLat = position.coords.latitude; // Store user's latitude
       userLng = position.coords.longitude; // Store user's longitude
-      map.setCenter({ lat: userLat, lng: userLng });
-      addMarker(userLat, userLng, 'Your Location');
+      map.setCenter({ lat: userLat, lng: userLng }); // Center the map on the user's location
+
+      // Check if the marker already exists
+      if (markers.length > 0) {
+        // Update the existing marker's position
+        markers[0].setPosition({ lat: userLat, lng: userLng });
+      } else {
+        // Create a new marker for the user's location
+        addMarker(userLat, userLng, 'Your Location');
+      }
+
       showNotification(`Your location has been updated on the map.`);
     }
 
@@ -299,16 +302,47 @@
       showNotification("Unable to retrieve your location.");
     }
 
-    function getUserLocation() {
+    function startTrackingUserLocation() {
       if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(updateUserLocation, handleLocationError);
+        navigator.geolocation.watchPosition(updateUserLocation, handleLocationError, {
+          enableHighAccuracy: true, // Use high accuracy if available
+          maximumAge: 0, // Do not use cached position
+          timeout: 5000 // Timeout after 5 seconds
+        });
       } else {
         showNotification("Geolocation is not supported by this browser.");
       }
     }
 
+    // Fetch user locations when the dashboard loads
+    function fetchUserLocations() {
+        fetch('fetch_user_locations.php')
+            .then(response => response.json())
+            .then(data => {
+                if (Array.isArray(data)) {
+                    data.forEach(location => {
+                        const sos = {
+                            type: 'User Location', // You can customize this
+                            location: `Lat: ${location.latitude}, Lng: ${location.longitude}`,
+                            time: new Date(location.timestamp).toLocaleTimeString(),
+                            description: 'User location retrieved from database.',
+                            status: 'Resolved', // You can customize this
+                        };
+                        addSOS(sos); // Call the function to create SOS card
+                    });
+                } else {
+                    console.error('Error fetching locations:', data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching user locations:', error);
+            });
+    }
+
+    // Call the function to fetch user locations
+    fetchUserLocations();
     initMap();
-    simulateIncomingSOS();
+    startTrackingUserLocation(); // Start tracking the user's location
   </script>
 </body>
 </html>

@@ -1,3 +1,16 @@
+<?php
+session_start(); // Start the session
+
+// Check if the user is logged in
+if (!isset($_SESSION['user_id'])) {
+    // User is not logged in, redirect to index.php
+    header("Location: index.php");
+    exit(); // Ensure no further code is executed
+}
+
+// User is logged in, you can proceed with the rest of the page
+?>
+
 <html>
 <head>
 <meta charset="UTF-8">
@@ -282,6 +295,7 @@
 <div class="container">
   <h1>Emergency Help Needed?</h1>
   <button id="sosButton">SOS</button>
+  <div id="alertMessage" style="margin-top: 10px; font-weight: bold;"></div> <!-- New message element -->
   <div id="map"></div>
   
   <div class="emergency-contacts" id="emergencyContact">
@@ -352,7 +366,7 @@
     <div class="help-center">Help Center</div>
     <div class="about">About</div>
     <hr>
-    <div class="logout">Log out</div>
+    <div class="logout" onclick="window.location.href='logout.php'">Log out</div>
   </div>
 
   <!-- Modal Structure -->
@@ -379,7 +393,9 @@
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBCKEvwgVPHmv39D-JLIcjPKT-LJmZMBRg"></script>
 <script>
 let map, marker;
-let isAlertActive = false;
+let isAlertActive = false; // Flag to track if the alert is active
+let watchId; // Variable to store the watch position ID
+let locationUpdateInterval; // Variable to store the interval ID
 
 function initMap() {
   const defaultLocation = { lat: -34.397, lng: 150.644 }; // Default location (can be anywhere)
@@ -396,39 +412,99 @@ function initMap() {
   });
 }
 
+function toggleAlert() {
+    const sosButton = document.getElementById('sosButton');
+
+    if (!isAlertActive) {
+        isAlertActive = true;
+        sosButton.classList.add('pulsing');
+        sosButton.textContent = 'ALERT ACTIVE';
+
+        console.log('Emergency alert activated!');
+        alert("Emergency alert activated!"); // Show alert message
+
+        // Start watching the user's location
+        watchId = navigator.geolocation.watchPosition(updateLocation, handleLocationError);
+
+        // Clear any existing interval before setting a new one
+        if (locationUpdateInterval) {
+            clearInterval(locationUpdateInterval);
+        }
+
+        // Set an interval to send location data every 5 seconds
+        locationUpdateInterval = setInterval(() => {
+            navigator.geolocation.getCurrentPosition((position) => {
+                const lat = position.coords.latitude;
+                const lng = position.coords.longitude;
+                sendLocationToServer(lat, lng); // Send location to server
+            }, handleLocationError);
+        }, 5000);
+    } else {
+        isAlertActive = false;
+        sosButton.classList.remove('pulsing');
+        sosButton.textContent = 'SOS';
+
+        console.log('Emergency alert deactivated.');
+        alert("Emergency alert deactivated!"); // Show alert message
+
+        // Stop watching the user's location
+        navigator.geolocation.clearWatch(watchId);
+
+        // Clear the interval to stop sending location data
+        clearInterval(locationUpdateInterval);
+        locationUpdateInterval = null; // Reset the interval variable
+
+        // Call the function to delete the user's location from the database
+        deleteUserLocation();
+    }
+}
+
 function updateLocation(position) {
-  const lat = position.coords.latitude;
-  const lng = position.coords.longitude;
-  
-  map.setCenter({ lat, lng });
-  marker.setPosition({ lat, lng });
-  marker.setVisible(true); // Show the marker when the location is updated
+    const lat = position.coords.latitude;
+    const lng = position.coords.longitude;
+
+    map.setCenter({ lat, lng });
+    marker.setPosition({ lat, lng });
+    marker.setVisible(true); // Show the marker when the location is updated
 }
 
 function handleLocationError(error) {
-  console.error("Error: " + error.message);
-  document.getElementById('statusMessage').textContent = "Unable to retrieve your location";
+    console.error("Error: " + error.message);
+    alert("Unable to retrieve your location");
 }
 
-function toggleAlert() {
-  const sosButton = document.getElementById('sosButton');
-  
-  if (!isAlertActive) {
-    isAlertActive = true;
-    sosButton.classList.add('pulsing');
-    sosButton.textContent = 'ALERT ACTIVE';
-    
-    console.log('Emergency alert activated!');
-    
-    navigator.geolocation.watchPosition(updateLocation, handleLocationError);
-    navigator.geolocation.getCurrentPosition(updateLocation, handleLocationError);
-  } else {
-    isAlertActive = false;
-    sosButton.classList.remove('pulsing');
-    sosButton.textContent = 'SOS';
-    
-    console.log('Emergency alert deactivated.');
-  }
+function sendLocationToServer(lat, lng) {
+    fetch('server_endpoint.php', { // Replace with your server endpoint
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ latitude: lat, longitude: lng }),
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('Location sent successfully:', data);
+    })
+    .catch((error) => {
+        console.error('Error sending location:', error);
+    });
+}
+
+function deleteUserLocation() {
+    fetch('delete_user_location.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ user_id: <?php echo $_SESSION['user_id']; ?> }) // Pass the user ID
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('Location deleted successfully:', data);
+    })
+    .catch((error) => {
+        console.error('Error deleting location:', error);
+    });
 }
 
 document.addEventListener('DOMContentLoaded', () => {
